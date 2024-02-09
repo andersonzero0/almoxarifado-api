@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AlmoxarifeModule } from './almoxarife/almoxarife.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -8,6 +9,7 @@ import { AlmoxarifeModule } from './almoxarife/almoxarife.module';
       envFilePath: '.env',
     }),
     AlmoxarifeModule,
+    PrismaModule,
   ],
   controllers: [],
   providers: [],
