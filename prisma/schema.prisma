@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Almoxarife {
+  id String @id @unique @default(cuid())
+  name String
+  username String @unique
+  password String
+  createdAt DateTime @default(now())
+
+  @@map("almoxarifes_tb")
+}
+
+model Requisitante {
+  id String @id @unique @default(cuid())
+  name String
+  username String @unique
+  password String
+  createdAt DateTime @default(now())
+
+  @@map("requisitantes_tb")
+}
+
+model Fornecedor {
+  id String @id @unique @default(cuid())
+  name String
+  tax_id String
+  phone String
+  email String
+  address String
+  cep String
+  city String
+  corporateReason String
+  agent String
+  bank String
+  agency String
+  account String
+  createdAt DateTime @default(now())
+
+  produtos Produto[]
+
+  @@map("fornecedores_tb")
+}
+
+model Produto {
+  id String @id @unique @default(cuid())
+  name String
+  description String
+  quantity Int
+  priceUnit Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  fornecedor Fornecedor @relation(fields: [fornecedorId], references: [id])
+  fornecedorId String
+
+  historicoProduto HistoricoProduto[]
+
+  @@map("produtos_tb")
+}
+
+model HistoricoProduto {
+  id String @id @unique @default(cuid())
+
+  
+  produto Produto @relation(fields: [produtoId], references: [id])
+  produtoId String
+
+  
+}
