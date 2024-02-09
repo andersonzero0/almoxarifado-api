@@ -17,6 +17,8 @@ model Almoxarife {
   password String
   createdAt DateTime @default(now())
 
+  historicosProduto HistoricoProduto[]
+
   @@map("almoxarifes_tb")
 }
 
@@ -26,6 +28,8 @@ model Requisitante {
   username String @unique
   password String
   createdAt DateTime @default(now())
+
+  requisicoes Requisicao[]
 
   @@map("requisitantes_tb")
 }
@@ -54,6 +58,7 @@ model Fornecedor {
 model Produto {
   id String @id @unique @default(cuid())
   name String
+  image_url String
   description String
   quantity Int
   priceUnit Int
@@ -65,16 +70,33 @@ model Produto {
   fornecedorId String
 
   historicoProduto HistoricoProduto[]
+  requisicoes Requisicao[]
 
   @@map("produtos_tb")
 }
 
 model HistoricoProduto {
   id String @id @unique @default(cuid())
-
+  quantityUpdate Int
+  description String
+  createdAt DateTime @default(now())
   
   produto Produto @relation(fields: [produtoId], references: [id])
   produtoId String
 
-  
+  almoxarife Almoxarife @relation(fields: [almoxarifeId], references: [id])
+  almoxarifeId String
+}
+
+model Requisicao {
+  id String @id @unique @default(cuid())
+  quantity Int
+  description String
+  createdAt DateTime @default(now())
+
+  requisitante Requisitante @relation(fields: [requisitanteId], references: [id])
+  requisitanteId String
+
+  produto Produto @relation(fields: [produtoId], references: [id])
+  produtoId String
 }
