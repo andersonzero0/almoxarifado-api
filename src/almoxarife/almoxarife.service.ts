@@ -1,17 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateAlmoxarifeDto, FindAlmoxarifeDto } from './dto/almoxarife.dto';
+import { CreateAlmoxarifeDto } from './dto/almoxarife.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AlmoxarifeService {
   constructor(private prisma: PrismaService) {}
 
-  async createAlmoxarife(almoxarifeData: CreateAlmoxarifeDto) {
+  async create(almoxarifeData: CreateAlmoxarifeDto) {
     try {
       const salt = await bcrypt.genSalt();
       const hash = await bcrypt.hash(almoxarifeData.password, salt);
@@ -29,17 +25,39 @@ export class AlmoxarifeService {
     }
   }
 
-  async findAlmoxarife(findAlmoxarifeDto: FindAlmoxarifeDto) {
+  async findMany() {
     try {
-      const almoxarife = await this.prisma.almoxarife.findUnique({
-        where: findAlmoxarifeDto
+      return await this.prisma.almoxarife.findMany({
+        select: {
+          id: true,
+          name: true,
+          username: true,
+        },
       });
+    } catch (error) {
+      throw error;
+    }
+  }
 
-      if (!almoxarife) {
-        throw new NotFoundException();
-      }
+  async findById(id: string) {
+    try {
+      return await this.prisma.almoxarife.findUnique({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
 
-      return almoxarife;
+  async findByUsername(username: string) {
+    try {
+      return await this.prisma.almoxarife.findUnique({
+        where: {
+          username,
+        },
+      });
     } catch (error) {
       throw error;
     }

@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "produtos_tb" ALTER COLUMN "image_url" DROP NOT NULL,
+ALTER COLUMN "description" DROP NOT NULL,
+ALTER COLUMN "quantity" SET DEFAULT 0,
+ALTER COLUMN "priceUnit" SET DEFAULT 0;

@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { IsLowercase, IsNotEmpty, IsOptional, IsString, Matches, MinLength, Validate, ValidationArguments } from "class-validator"
 
-export class CreateAlmoxarifeDto {
+export class CreateRequisitanteDto {
   @ApiProperty({
     description: 'Nome do almoxarife.',
     example: 'João'

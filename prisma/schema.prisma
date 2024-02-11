@@ -17,6 +17,8 @@ model Almoxarife {
   password String
   createdAt DateTime @default(now())
 
+  fornecedores Fornecedor[]
+  produtos Produto[]
   historicosProduto HistoricoProduto[]
 
   @@map("almoxarifes_tb")
@@ -37,20 +39,23 @@ model Requisitante {
 model Fornecedor {
   id String @id @unique @default(cuid())
   name String
-  tax_id String
-  phone String
-  email String
-  address String
-  cep String
-  city String
-  corporateReason String
-  agent String
-  bank String
-  agency String
-  account String
+  tax_id String?
+  phone String?
+  email String?
+  address String?
+  cep String?
+  city String?
+  corporateReason String?
+  agent String?
+  bank String?
+  agency String?
+  account String?
   createdAt DateTime @default(now())
 
   produtos Produto[]
+
+  almoxarife Almoxarife @relation(fields: [almoxarifeId], references: [id])
+  almoxarifeId String
 
   @@map("fornecedores_tb")
 }
@@ -58,10 +63,10 @@ model Fornecedor {
 model Produto {
   id String @id @unique @default(cuid())
   name String
-  image_url String
-  description String
-  quantity Int
-  priceUnit Int
+  image_url String?
+  description String?
+  quantity Int @default(0)
+  priceUnit Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -69,14 +74,23 @@ model Produto {
   fornecedor Fornecedor @relation(fields: [fornecedorId], references: [id])
   fornecedorId String
 
+  almoxarife Almoxarife @relation(fields: [almoxarifeId], references: [id])
+  almoxarifeId String
+
   historicoProduto HistoricoProduto[]
   requisicoes Requisicao[]
 
   @@map("produtos_tb")
 }
 
+enum ActionHistorico {
+  ADDED
+  REMOVED
+}
+
 model HistoricoProduto {
   id String @id @unique @default(cuid())
+  action ActionHistorico
   quantityUpdate Int
   description String
   createdAt DateTime @default(now())
@@ -88,9 +102,16 @@ model HistoricoProduto {
   almoxarifeId String
 }
 
+enum StatusRequisicao {
+  PENDENTE
+  APROVADO
+  NEGADO
+}
+
 model Requisicao {
   id String @id @unique @default(cuid())
   quantity Int
+  status StatusRequisicao @default(PENDENTE) 
   description String
   createdAt DateTime @default(now())
 

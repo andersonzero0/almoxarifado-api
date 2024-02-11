@@ -1,35 +1,33 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
   Post,
-  Query,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { AlmoxarifeService } from './almoxarife.service';
-import { CreateAlmoxarifeDto, FindAlmoxarifeDto } from './dto/almoxarife.dto';
+import { CreateAlmoxarifeDto } from './dto/almoxarife.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/auth/public.decorator';
 
+@ApiTags('almoxarife')
 @Controller('almoxarife')
 export class AlmoxarifeController {
   constructor(private almoxarifeService: AlmoxarifeService) {}
 
+  @Public()
   @Post()
-  @UsePipes(new ValidationPipe())
-  async createAlmoxarife(@Body() createAlmoxarifeDto: CreateAlmoxarifeDto) {
+  async create(@Body() createAlmoxarifeDto: CreateAlmoxarifeDto) {
     try {
-      return await this.almoxarifeService.createAlmoxarife(createAlmoxarifeDto);
+      return await this.almoxarifeService.create(createAlmoxarifeDto);
     } catch (error) {
       throw error;
     }
   }
 
   @Get()
-  @UsePipes(new ValidationPipe())
-  async findAlmoxarife(@Query() findAlmoxarifeDto: FindAlmoxarifeDto) {
+  async findMany() {
     try {
-      return await this.almoxarifeService.findAlmoxarife(findAlmoxarifeDto)
+      return await this.almoxarifeService.findMany()
     } catch (error) {
       throw error;
     }
