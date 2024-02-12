@@ -8,6 +8,7 @@ import { AlmoxarifeModule } from 'src/almoxarife/almoxarife.module';
 @Module({
   imports: [PrismaModule, FornecedorModule, AlmoxarifeModule],
   providers: [ProdutoService],
-  controllers: [ProdutoController]
+  controllers: [ProdutoController],
+  exports: [ProdutoService]
 })
 export class ProdutoModule {}

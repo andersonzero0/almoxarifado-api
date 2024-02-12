@@ -6,6 +6,7 @@ import { RequisitanteModule } from './requisitante/requisitante.module';
 import { AuthModule } from './auth/auth.module';
 import { FornecedorModule } from './fornecedor/fornecedor.module';
 import { ProdutoModule } from './produto/produto.module';
+import { RequisicaoModule } from './requisicao/requisicao.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ProdutoModule } from './produto/produto.module';
     AuthModule,
     FornecedorModule,
     ProdutoModule,
+    RequisicaoModule,
   ],
   controllers: [],
   providers: [],

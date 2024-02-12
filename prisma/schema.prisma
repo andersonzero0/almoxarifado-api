@@ -18,6 +18,7 @@ model Almoxarife {
   createdAt DateTime @default(now())
 
   fornecedores Fornecedor[]
+  requisicoes Requisicao[]
   produtos Produto[]
   historicosProduto HistoricoProduto[]
 
@@ -117,6 +118,9 @@ model Requisicao {
 
   requisitante Requisitante @relation(fields: [requisitanteId], references: [id])
   requisitanteId String
+
+  almoxarife Almoxarife? @relation(fields: [almoxarifeId], references: [id])
+  almoxarifeId String?
 
   produto Produto @relation(fields: [produtoId], references: [id])
   produtoId String

@@ -1,8 +1,9 @@
-import { Optional } from '@nestjs/common';
-import { IsInt, IsNotEmpty, IsNumber, IsString, IsUrl } from 'class-validator';
+import { OmitType } from '@nestjs/swagger';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
 
 export class CreateProdutoDto {
   @IsString()
+  @MaxLength(20)
   @IsNotEmpty()
   name: string;
 
@@ -10,20 +11,48 @@ export class CreateProdutoDto {
   @IsNotEmpty()
   fornecedorId: string
 
-  @Optional()
+  @IsOptional()
   @IsUrl()
+  @MaxLength(225)
   image_url: string;
 
-  @Optional()
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(225)
   description: string;
 
-  @Optional()
+  @IsOptional()
   @IsInt()
   quantity: number;
 
-  @Optional()
+  @IsOptional()
   @IsInt()
   priceUnit: number;
+}
+
+export class UpdateProdutoDto extends OmitType(CreateProdutoDto, ['quantity'] as const) {}
+
+enum Action {
+  ADDED = 'ADDED',
+  REMOVED = 'REMOVED'
+}
+
+export class ActionProdutoDto {
+  @IsEnum(Action)
+  action: Action
+
+  @IsInt()
+  quantityUpdate: number
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(225)
+  description: string
+}
+
+export enum OperationsUpdateProduct {
+  INCREMENT = 'INCREMENT',
+  DECREMENT = 'DECREMENT'
 }

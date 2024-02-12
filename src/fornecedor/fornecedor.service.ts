@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFornecedorDto } from './dto/fornecedor.dto';
 import { AlmoxarifeService } from 'src/almoxarife/almoxarife.service';
@@ -15,7 +15,7 @@ export class FornecedorService {
       const almoxarife = await this.almoxarifeService.findById(almoxarifeId);
 
       if (!almoxarife) {
-        throw new ForbiddenException();
+        throw new NotFoundException('Almoxarife não encontrado(a)!')
       }
 
       return await this.prisma.fornecedor.create({
@@ -31,7 +31,7 @@ export class FornecedorService {
 
   async findMany() {
     try {
-      return await this.prisma.fornecedor.findMany()
+      return await this.prisma.fornecedor.findMany();
     } catch (error) {
       throw error;
     }
@@ -41,9 +41,46 @@ export class FornecedorService {
     try {
       return await this.prisma.fornecedor.findUnique({
         where: {
-          id
-        }
-      })
+          id,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async update(fornecedorId: string, data: CreateFornecedorDto) {
+    try {
+      const fornecedor = await this.findById(fornecedorId);
+
+      if (!fornecedor) {
+        throw new NotFoundException('Fornecedor não encontrado(a)!')
+      }
+
+      return await this.prisma.fornecedor.update({
+        data,
+        where: {
+          id: fornecedorId,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async delete(fornecedorId: string) {
+    try {
+      const fornecedor = await this.findById(fornecedorId);
+
+      if (!fornecedor) {
+        throw new NotFoundException('Fornecedor não encontrado(a)!')
+      }
+
+      return await this.prisma.fornecedor.delete({
+        where: {
+          id: fornecedorId,
+        },
+      });
     } catch (error) {
       throw error;
     }

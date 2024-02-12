@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateAlmoxarifeDto } from './dto/almoxarife.dto';
+import { CreateAlmoxarifeDto, UpdateAlmoxarifeDto } from './dto/almoxarife.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class AlmoxarifeService {
         },
       });
     } catch (error) {
-      throw new BadRequestException();
+      throw error;
     }
   }
 
@@ -60,6 +60,33 @@ export class AlmoxarifeService {
       });
     } catch (error) {
       throw error;
+    }
+  }
+
+  async update(almoxarifeId: string, data: UpdateAlmoxarifeDto) {
+    try {
+      const almoxarife = await this.findById(almoxarifeId)
+
+      if(!almoxarife) {
+        throw new NotFoundException('Almoxarife não encontrado(a)!')
+      }
+
+      const isMatch = await bcrypt.compare(data.oldPassword, almoxarife.password)
+
+      if(!isMatch) {
+        throw new UnauthorizedException('Senha incorreta!')
+      }
+
+      delete data.oldPassword
+      
+      return await this.prisma.almoxarife.update({
+        data,
+        where: {
+          id: almoxarifeId
+        }
+      })
+    } catch (error) {
+      throw error
     }
   }
 }
