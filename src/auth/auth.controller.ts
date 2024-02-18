@@ -15,10 +15,10 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @Post(':typeUser')
-  async auth(@Body() authDto: AuthDto, @Param('typeUser') typeUser: string) {
+  @Post()
+  async auth(@Body() authDto: AuthDto) {
     try {
-      return await this.authService.auth(authDto, typeUser);
+      return await this.authService.auth(authDto);
     } catch (error) {
       throw error;
     }

@@ -1,23 +1,24 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateAlmoxarifeDto, UpdateAlmoxarifeDto } from './dto/almoxarife.dto';
+import { CreateUsuarioDto, UpdateUsuarioDto } from './dto/usuario.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class AlmoxarifeService {
+export class UsuarioService {
   constructor(private prisma: PrismaService) {}
 
-  async create(almoxarifeData: CreateAlmoxarifeDto) {
+  async create(usuarioData: CreateUsuarioDto) {
     try {
       const salt = await bcrypt.genSalt();
-      const hash = await bcrypt.hash(almoxarifeData.password, salt);
+      const hash = await bcrypt.hash(usuarioData.password, salt);
 
-      return await this.prisma.almoxarife.create({
-        data: { ...almoxarifeData, password: hash },
+      return await this.prisma.usuario.create({
+        data: { ...usuarioData, password: hash },
         select: {
           name: true,
           username: true,
           createdAt: true,
+          role: true
         },
       });
     } catch (error) {
@@ -27,11 +28,12 @@ export class AlmoxarifeService {
 
   async findMany() {
     try {
-      return await this.prisma.almoxarife.findMany({
+      return await this.prisma.usuario.findMany({
         select: {
           id: true,
           name: true,
           username: true,
+          role: true
         },
       });
     } catch (error) {
@@ -41,7 +43,7 @@ export class AlmoxarifeService {
 
   async findById(id: string) {
     try {
-      return await this.prisma.almoxarife.findUnique({
+      return await this.prisma.usuario.findUnique({
         where: {
           id,
         },
@@ -53,7 +55,7 @@ export class AlmoxarifeService {
 
   async findByUsername(username: string) {
     try {
-      return await this.prisma.almoxarife.findUnique({
+      return await this.prisma.usuario.findUnique({
         where: {
           username,
         },
@@ -63,15 +65,15 @@ export class AlmoxarifeService {
     }
   }
 
-  async update(almoxarifeId: string, data: UpdateAlmoxarifeDto) {
+  async update(usuarioId: string, data: UpdateUsuarioDto) {
     try {
-      const almoxarife = await this.findById(almoxarifeId)
+      const usuario = await this.findById(usuarioId)
 
-      if(!almoxarife) {
-        throw new NotFoundException('Almoxarife não encontrado(a)!')
+      if(!usuario) {
+        throw new NotFoundException('Usuário não encontrado(a)!')
       }
 
-      const isMatch = await bcrypt.compare(data.oldPassword, almoxarife.password)
+      const isMatch = await bcrypt.compare(data.oldPassword, usuario.password)
 
       if(!isMatch) {
         throw new UnauthorizedException('Senha incorreta!')
@@ -79,10 +81,10 @@ export class AlmoxarifeService {
 
       delete data.oldPassword
       
-      return await this.prisma.almoxarife.update({
+      return await this.prisma.usuario.update({
         data,
         where: {
-          id: almoxarifeId
+          id: usuarioId
         }
       })
     } catch (error) {

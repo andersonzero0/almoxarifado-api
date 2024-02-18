@@ -10,76 +10,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Almoxarife {
-  id String @id @unique @default(cuid())
-  name String
-  username String @unique
-  password String
-  createdAt DateTime @default(now())
-
-  fornecedores Fornecedor[]
-  requisicoes Requisicao[]
-  produtos Produto[]
-  historicosProduto HistoricoProduto[]
-
-  @@map("almoxarifes_tb")
+enum Roles {
+  ADMIN
+  ALMOXARIFE
+  REQUISITANTE
 }
 
-model Requisitante {
-  id String @id @unique @default(cuid())
-  name String
-  username String @unique
-  password String
+model Usuario {
+  id        String   @id @unique @default(cuid())
+  name      String
+  username  String   @unique
+  password  String
+  role      Roles
   createdAt DateTime @default(now())
 
-  requisicoes Requisicao[]
+  fornecedores           Fornecedor[]
+  createdRequisitions    Requisicao[]       @relation("CreatorRelation")
+  authorizedRequisitions Requisicao[]       @relation("AuthorizerRelation")
+  produtos               Produto[]
+  historicosProduto      HistoricoProduto[]
 
-  @@map("requisitantes_tb")
+  @@map("usuarios_tb")
 }
 
 model Fornecedor {
-  id String @id @unique @default(cuid())
-  name String
-  tax_id String?
-  phone String?
-  email String?
-  address String?
-  cep String?
-  city String?
+  id              String   @id @unique @default(cuid())
+  name            String
+  tax_id          String?
+  phone           String?
+  email           String?
+  address         String?
+  cep             String?
+  city            String?
   corporateReason String?
-  agent String?
-  bank String?
-  agency String?
-  account String?
-  createdAt DateTime @default(now())
+  agent           String?
+  bank            String?
+  agency          String?
+  account         String?
+  createdAt       DateTime @default(now())
 
   produtos Produto[]
 
-  almoxarife Almoxarife @relation(fields: [almoxarifeId], references: [id])
-  almoxarifeId String
+  creator   Usuario @relation(fields: [creatorId], references: [id])
+  creatorId String
 
   @@map("fornecedores_tb")
 }
 
 model Produto {
-  id String @id @unique @default(cuid())
-  name String
-  image_url String?
+  id          String  @id @unique @default(cuid())
+  name        String
+  image_url   String?
   description String?
-  quantity Int @default(0)
-  priceUnit Int @default(0)
+  quantity    Int     @default(0)
+  priceUnit   Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  fornecedor Fornecedor @relation(fields: [fornecedorId], references: [id])
+  fornecedor   Fornecedor @relation(fields: [fornecedorId], references: [id])
   fornecedorId String
 
-  almoxarife Almoxarife @relation(fields: [almoxarifeId], references: [id])
-  almoxarifeId String
+  creator   Usuario @relation(fields: [creatorId], references: [id])
+  creatorId String
 
   historicoProduto HistoricoProduto[]
-  requisicoes Requisicao[]
+  requisicoes      Requisicao[]
 
   @@map("produtos_tb")
 }
@@ -90,17 +86,17 @@ enum ActionHistorico {
 }
 
 model HistoricoProduto {
-  id String @id @unique @default(cuid())
-  action ActionHistorico
+  id             String          @id @unique @default(cuid())
+  action         ActionHistorico
   quantityUpdate Int
-  description String
-  createdAt DateTime @default(now())
-  
-  produto Produto @relation(fields: [produtoId], references: [id])
+  description    String
+  createdAt      DateTime        @default(now())
+
+  produto   Produto @relation(fields: [produtoId], references: [id])
   produtoId String
 
-  almoxarife Almoxarife @relation(fields: [almoxarifeId], references: [id])
-  almoxarifeId String
+  creator   Usuario @relation(fields: [creatorId], references: [id])
+  creatorId String
 }
 
 enum StatusRequisicao {
@@ -110,18 +106,18 @@ enum StatusRequisicao {
 }
 
 model Requisicao {
-  id String @id @unique @default(cuid())
-  quantity Int
-  status StatusRequisicao @default(PENDENTE) 
+  id          String           @id @unique @default(cuid())
+  quantity    Int
+  status      StatusRequisicao @default(PENDENTE)
   description String
-  createdAt DateTime @default(now())
+  createdAt   DateTime         @default(now())
 
-  requisitante Requisitante @relation(fields: [requisitanteId], references: [id])
-  requisitanteId String
+  creator   Usuario @relation("CreatorRelation", fields: [creatorId], references: [id])
+  creatorId String
 
-  almoxarife Almoxarife? @relation(fields: [almoxarifeId], references: [id])
-  almoxarifeId String?
+  authorizer   Usuario? @relation("AuthorizerRelation", fields: [authorizerId], references: [id])
+  authorizerId String?
 
-  produto Produto @relation(fields: [produtoId], references: [id])
+  produto   Produto @relation(fields: [produtoId], references: [id])
   produtoId String
 }

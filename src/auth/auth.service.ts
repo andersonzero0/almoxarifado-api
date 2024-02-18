@@ -3,44 +3,21 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AlmoxarifeService } from 'src/almoxarife/almoxarife.service';
-import { RequisitanteService } from 'src/requisitante/requisitante.service';
+import { UsuarioService } from 'src/usuario/usuario.service';
 import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
-enum TypeUser {
-  Almoxarife = 'almoxarife',
-  Requisitante = 'requisitante',
-}
-
 @Injectable()
 export class AuthService {
   constructor(
-    private almoxarifeService: AlmoxarifeService,
-    private requisitanteService: RequisitanteService,
+    private usuarioService: UsuarioService,
     private jwtService: JwtService,
   ) {}
 
-  async auth(authDto: AuthDto, typeUser: string) {
+  async auth(authDto: AuthDto) {
     try {
-      let user: any;
-
-      if (typeUser == TypeUser.Almoxarife) {
-        user = await this.almoxarifeService.findByUsername(authDto.username);
-        user = {
-          ...user,
-          typeUser: TypeUser.Almoxarife,
-        };
-      } else if (typeUser == TypeUser.Requisitante) {
-        user = await this.requisitanteService.findByUsername(authDto.username);
-        user = {
-          ...user,
-          typeUser: TypeUser.Requisitante,
-        };
-      } else {
-        throw new ForbiddenException();
-      }
+      const user = await this.usuarioService.findByUsername(authDto.username)
 
       if(!user.id) {
         throw new UnauthorizedException();
@@ -52,7 +29,7 @@ export class AuthService {
         throw new UnauthorizedException();
       }
 
-      const payload = { id: user.id, typeUser: user.typeUser };
+      const payload = { id: user.id, role: user.role };
       return {
         access_token: await this.jwtService.signAsync(payload),
       };

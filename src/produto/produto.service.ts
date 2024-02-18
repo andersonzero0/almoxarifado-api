@@ -7,22 +7,22 @@ import {
   UpdateProdutoDto,
 } from './dto/produto.dto';
 import { FornecedorService } from 'src/fornecedor/fornecedor.service';
-import { AlmoxarifeService } from 'src/almoxarife/almoxarife.service';
+import { UsuarioService } from 'src/usuario/usuario.service';
 
 @Injectable()
 export class ProdutoService {
   constructor(
     private prisma: PrismaService,
     private fornecedorService: FornecedorService,
-    private almoxarifeService: AlmoxarifeService,
+    private usuarioService: UsuarioService,
   ) {}
 
-  async create(createProdutoDto: CreateProdutoDto, almoxarifeId: string) {
+  async create(createProdutoDto: CreateProdutoDto, usuarioId: string) {
     try {
-      const almoxarife = await this.almoxarifeService.findById(almoxarifeId);
+      const usuario = await this.usuarioService.findById(usuarioId);
 
-      if (!almoxarife) {
-        throw new NotFoundException('Almoxarife não encontrado(a)!')
+      if (!usuario) {
+        throw new NotFoundException('Usuário não encontrado(a)!')
       }
 
       const fornecedor = await this.fornecedorService.findById(
@@ -36,7 +36,7 @@ export class ProdutoService {
       return await this.prisma.produto.create({
         data: {
           ...createProdutoDto,
-          almoxarifeId,
+          creatorId: usuarioId,
         },
       });
     } catch (error) {
@@ -161,7 +161,7 @@ export class ProdutoService {
 
   async createHistoricoProduct(
     produtoId: string,
-    almoxarifeId: string,
+    usuarioId: string,
     actionProdutoDto: ActionProdutoDto,
   ) {
     try {
@@ -171,9 +171,9 @@ export class ProdutoService {
         throw new NotFoundException('Produto não encontrado(a)!')
       }
 
-      const almoxarife = await this.almoxarifeService.findById(almoxarifeId);
+      const usuario = await this.usuarioService.findById(usuarioId);
 
-      if (!almoxarife) {
+      if (!usuario) {
         throw new NotFoundException('Produto não encontrado(a)!')
       }
 
@@ -181,7 +181,7 @@ export class ProdutoService {
         data: {
           ...actionProdutoDto,
           produtoId,
-          almoxarifeId,
+          creatorId: usuarioId,
         },
       });
     } catch (error) {

@@ -1,27 +1,27 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFornecedorDto } from './dto/fornecedor.dto';
-import { AlmoxarifeService } from 'src/almoxarife/almoxarife.service';
+import { UsuarioService } from 'src/usuario/usuario.service';
 
 @Injectable()
 export class FornecedorService {
   constructor(
     private prisma: PrismaService,
-    private almoxarifeService: AlmoxarifeService,
+    private usuarioService: UsuarioService,
   ) {}
 
-  async create(createFornecedorDto: CreateFornecedorDto, almoxarifeId: string) {
+  async create(createFornecedorDto: CreateFornecedorDto, usuarioId: string) {
     try {
-      const almoxarife = await this.almoxarifeService.findById(almoxarifeId);
+      const usuario = await this.usuarioService.findById(usuarioId);
 
-      if (!almoxarife) {
+      if (!usuario) {
         throw new NotFoundException('Almoxarife não encontrado(a)!')
       }
 
       return await this.prisma.fornecedor.create({
         data: {
           ...createFornecedorDto,
-          almoxarifeId,
+          creatorId: usuarioId,
         },
       });
     } catch (error) {

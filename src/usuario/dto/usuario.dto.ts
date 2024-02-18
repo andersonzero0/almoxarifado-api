@@ -1,7 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsLowercase, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength, Validate, ValidationArguments } from "class-validator"
+import { IsEnum, IsLowercase, IsNotEmpty, IsString, Matches, MaxLength, MinLength, Validate, ValidationArguments } from "class-validator"
+import { Role } from "src/roles/roles.enum"
 
-export class CreateAlmoxarifeDto {
+export class CreateUsuarioDto {
   @ApiProperty({
     description: 'Nome do almoxarife.',
     example: 'João'
@@ -15,12 +16,12 @@ export class CreateAlmoxarifeDto {
     description: 'Nome de usuário que será usado para ser efectudado o login.',
     example: 'joao123'
   })
+  @IsNotEmpty()
   @Matches(/^[^\s]*$/, {
     message: 'username should not contain spaces',
   })
   @IsString()
   @IsLowercase()
-  @IsNotEmpty()
   @MaxLength(20)
   username: string
 
@@ -33,9 +34,12 @@ export class CreateAlmoxarifeDto {
   @MaxLength(20)
   @IsNotEmpty()
   password: string
+
+  @IsEnum(Role)
+  role: Role
 }
 
-export class UpdateAlmoxarifeDto extends CreateAlmoxarifeDto {
+export class UpdateUsuarioDto extends CreateUsuarioDto {
   @ApiProperty({
     description: 'Antiga senha',
     example: 'senha123'

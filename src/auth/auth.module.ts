@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { AlmoxarifeModule } from 'src/almoxarife/almoxarife.module';
-import { RequisitanteModule } from 'src/requisitante/requisitante.module';
+import { UsuarioModule } from 'src/usuario/usuario.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 
 @Module({
-  imports: [AlmoxarifeModule, RequisitanteModule, JwtModule.register({
+  imports: [UsuarioModule, JwtModule.register({
     global: true,
     secret: jwtConstants.secret,
     signOptions: { expiresIn: '30d' }

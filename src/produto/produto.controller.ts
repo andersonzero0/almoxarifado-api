@@ -14,6 +14,8 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ProdutoService } from './produto.service';
 import { ActionProdutoDto, CreateProdutoDto, UpdateProdutoDto } from './dto/produto.dto';
+import { Roles } from 'src/roles/roles.decorator';
+import { Role } from 'src/roles/roles.enum';
 
 @ApiTags('produto')
 @Controller('produto')
@@ -22,14 +24,12 @@ export class ProdutoController {
 
   @ApiBearerAuth('Auth')
   @Post()
+  @Roles(Role.ADMIN, Role.ALMOXARIFE)
   async create(
     @Body() createProdutoDto: CreateProdutoDto,
     @Request() req: any,
   ) {
     try {
-      if (req.user.typeUser != 'almoxarife') {
-        throw new UnauthorizedException('Seu usuário não está autorizado!');
-      }
       return await this.produtoService.create(createProdutoDto, req.user.id);
     } catch (error) {
       throw error;
@@ -64,12 +64,9 @@ export class ProdutoController {
 
   @ApiBearerAuth('Auth')
   @Put(':id')
+  @Roles(Role.ADMIN, Role.ALMOXARIFE)
   async update(@Request() req: any, @Body() data: UpdateProdutoDto, @Param('id') produtoId: string) {
     try {
-      if(req.user.typeUser != 'almoxarife') {
-        throw new UnauthorizedException('Seu usuário não está autorizado!')
-      }
-
       return await this.produtoService.update(produtoId, data)
     } catch (error) {
       throw error;
@@ -78,12 +75,9 @@ export class ProdutoController {
 
   @ApiBearerAuth('Auth')
   @Delete(':id')
+  @Roles(Role.ADMIN, Role.ALMOXARIFE)
   async delete(@Request() req: any, @Param('id') produtoId: string) {
     try {
-      if(req.user.typeUser != 'almoxarife') {
-        throw new UnauthorizedException('Seu usuário não está autorizado!')
-      }
-
       return await this.produtoService.delete(produtoId)
     } catch (error) {
       throw error;
@@ -92,16 +86,13 @@ export class ProdutoController {
 
   @ApiBearerAuth('Auth')
   @Patch(':id/action')
+  @Roles(Role.ADMIN, Role.ALMOXARIFE)
   async actionProduct(
     @Param('id') productId: string,
     @Request() req: any,
     @Body() actionProductDto: ActionProdutoDto,
   ) {
     try {
-      if (req.user.typeUser != 'almoxarife') {
-        throw new UnauthorizedException('Seu usuário não está autorizado!');
-      }
-
       return await this.produtoService.createHistoricoProduct(
         productId,
         req.user.id,

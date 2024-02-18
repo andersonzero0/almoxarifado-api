@@ -16,6 +16,8 @@ import {
   CreateRequisicaoDto,
   UpdateStatusRequisicaoDto,
 } from './dto/requisicao.dto';
+import { Roles } from 'src/roles/roles.decorator';
+import { Role } from 'src/roles/roles.enum';
 
 @ApiTags('requisicao')
 @Controller('requisicao')
@@ -24,12 +26,9 @@ export class RequisicaoController {
 
   @ApiBearerAuth('Auth')
   @Post()
+  @Roles(Role.REQUISITANTE, Role.ADMIN)
   async create(@Request() req: any, @Body() data: CreateRequisicaoDto) {
     try {
-      if (req.user.typeUser != 'requisitante') {
-        throw new UnauthorizedException('Seu usuário não está autorizado!');
-      }
-
       return await this.requisicaoService.create(req.user.id, data);
     } catch (error) {
       throw error;
@@ -38,6 +37,7 @@ export class RequisicaoController {
 
   @ApiBearerAuth('Auth')
   @Get()
+  @Roles(Role.ADMIN, Role.ALMOXARIFE)
   async findMany() {
     try {
       return await this.requisicaoService.findMany()
@@ -53,15 +53,12 @@ export class RequisicaoController {
     }),
   )
   @Patch(':id/status/:status')
+  @Roles(Role.ALMOXARIFE, Role.ADMIN)
   async updateStatus(
     @Param() data: UpdateStatusRequisicaoDto,
     @Request() req: any,
   ) {
     try {
-      if (req.user.typeUser != 'almoxarife') {
-        throw new UnauthorizedException('Seu usuário não está autorizado!');
-      }
-
       return await this.requisicaoService.updateStatus(
         data.id,
         req.user.id,

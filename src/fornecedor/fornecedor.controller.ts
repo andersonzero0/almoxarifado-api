@@ -16,6 +16,8 @@ import {
 import { FornecedorService } from './fornecedor.service';
 import { CreateFornecedorDto } from './dto/fornecedor.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/roles/roles.decorator';
+import { Role } from 'src/roles/roles.enum';
 
 @ApiTags('fornecedor')
 @Controller('fornecedor')
@@ -24,14 +26,12 @@ export class FornecedorController {
 
   @ApiBearerAuth('Auth')
   @Post()
+  @Roles(Role.ADMIN, Role.ALMOXARIFE)
   async create(
     @Body() createFornecedorDto: CreateFornecedorDto,
     @Request() req: any,
   ) {
     try {
-      if (req.user.typeUser != 'almoxarife') {
-        throw new UnauthorizedException('Seu usuário não está autorizado!');
-      }
       return await this.fornecedorService.create(
         createFornecedorDto,
         req.user.id,
@@ -69,6 +69,7 @@ export class FornecedorController {
 
   @ApiBearerAuth('Auth')
   @Put(':id')
+  @Roles(Role.ADMIN, Role.ALMOXARIFE)
   async update(@Request() req: any, @Body() data: CreateFornecedorDto, @Param('id') fornecedorId: string) {
     try {
       if(req.user.typeUser != 'almoxarife') {
@@ -83,6 +84,7 @@ export class FornecedorController {
 
   @ApiBearerAuth('Auth')
   @Delete(':id')
+  @Roles(Role.ADMIN, Role.ALMOXARIFE)
   async delete(@Request() req: any, @Param('id') fornecedorId: string) {
     try {
       if(req.user.typeUser != 'almoxarife') {

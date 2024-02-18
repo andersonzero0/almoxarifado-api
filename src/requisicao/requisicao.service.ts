@@ -1,6 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { AlmoxarifeService } from 'src/almoxarife/almoxarife.service';
-import { RequisitanteService } from 'src/requisitante/requisitante.service';
+import { UsuarioService } from 'src/usuario/usuario.service';
 import { CreateRequisicaoDto } from './dto/requisicao.dto';
 import { ProdutoService } from 'src/produto/produto.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,20 +10,19 @@ import { OperationsUpdateProduct } from 'src/produto/dto/produto.dto';
 export class RequisicaoService {
   constructor(
     private prisma: PrismaService,
-    private requisitanteService: RequisitanteService,
-    private almoxarifeService: AlmoxarifeService,
+    private usuarioService: UsuarioService,
     private produtoService: ProdutoService
   ) {}
 
   async create(
-    requisitanteId: string,
+    usuarioId: string,
     createRequisicaoDto: CreateRequisicaoDto,
   ) {
     try {
-      const requisitante = await this.requisitanteService.findById(requisitanteId);
+      const usuario = await this.usuarioService.findById(usuarioId);
 
-      if (!requisitante) {
-        throw new NotFoundException('Requisitante não encontrado(a)!');
+      if (!usuario) {
+        throw new NotFoundException('Usuário não encontrado(a)!');
       }
 
       const produto = await this.produtoService.findById(
@@ -38,7 +36,7 @@ export class RequisicaoService {
       return await this.prisma.requisicao.create({
         data: {
           ...createRequisicaoDto,
-          requisitanteId,
+          creatorId: usuarioId,
         },
       });
     } catch (error) {
@@ -66,7 +64,19 @@ export class RequisicaoService {
     }
   }
 
-  async updateStatus(requisicaoId: string, almoxarifeId: string, status: StatusRequisicao) {
+  async findByUserId(usuarioId: string) {
+    try {
+      return await this.prisma.requisicao.findMany({
+        where: {
+          creatorId: usuarioId
+        }
+      })
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateStatus(requisicaoId: string, usuarioId: string, status: StatusRequisicao) {
     try {
       const requisicao = await this.findById(requisicaoId)
 
@@ -78,10 +88,10 @@ export class RequisicaoService {
         throw new NotFoundException('Requisicao não encontrado(a)!')
       }
 
-      const almoxarife = await this.almoxarifeService.findById(almoxarifeId)
+      const usuario = await this.usuarioService.findById(usuarioId)
 
-      if(!almoxarife) {
-        throw new NotFoundException('Almoxarife não encontrado(a)!')
+      if(!usuario) {
+        throw new NotFoundException('Usuário não encontrado(a)!')
       }
 
       if(requisicao.status == 'APROVADO') {
