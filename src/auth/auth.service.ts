@@ -29,8 +29,12 @@ export class AuthService {
         throw new UnauthorizedException();
       }
 
+      delete user.password
+      delete user.id
+
       const payload = { id: user.id, role: user.role };
       return {
+        ...user,
         access_token: await this.jwtService.signAsync(payload),
       };
     } catch (error) {
