@@ -18,8 +18,8 @@ export class AuthService {
   async auth(authDto: AuthDto) {
     try {
       const user = await this.usuarioService.findByUsername(authDto.username)
-
-      if(!user.id) {
+      
+      if(!user) {
         throw new UnauthorizedException();
       }
 
